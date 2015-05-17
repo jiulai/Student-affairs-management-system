@@ -7,27 +7,64 @@
 //
 
 #include "Students.h"
+#include <iostream>
 
-bool STUDENTS::check(char *account, char *password)
+int STUDENTS::evaID = 1;
+
+bool STUDENTS::check()
 {
-    char temp[255] = {"select* from students where stuID = "};
+    std::string temp = {"select* from students where stuID = "};
+    temp += _stuID + " and password = '" + _Password + "'";
+    return BaseAction::check(temp);
+}
+
+void STUDENTS::evaluate()
+{
+    std::cout << "请输入想评价老师的ID:";
+    std::string tecID;
+    std::cin >> tecID;
     
-    strcat(temp, account);
-    strcat(temp, " and password = '");
-    strcat(temp, password);
-    strcat(temp, "'");
+    std::cout << "请输入评价内容:";
+    std::string comments;
+    getline(std::cin, comments);
     
+    std::string temp {"insert into evaluation value("};
+    temp += std::to_string(evaID++) + ", '" + tecID + "', '" +
+                                                comments + "')";
+    
+    mysql_init(&mysql);
     connect("localhost", "root", "wjwjksning1995..",
             "stuInfoManagement", 3306, nullptr, 0);
-    
     mysql_query(&mysql, "set names utf8");
-    mysql_query(&mysql, temp);
-    MYSQL_RES *result = mysql_store_result(&mysql);
     
-    unsigned long row = mysql_num_rows(result);
+    mysql_query(&mysql, temp.data());
     mysql_close(&mysql);
-    mysql_free_result(result);
-    if(row == 0)
-        return false;
-    return true;
+}
+
+void STUDENTS::show()
+{
+    bool q = true;
+    int num = 0;
+label:
+    std::cout << "1.查询\n" <<
+                 "2.评价\n" <<
+                 "3.";
+    q = quit();
+    if (q)
+    {
+        std::cin >> num;
+        switch (num)
+        {
+            case 1:
+                BaseAction::show();
+                break;
+            case 2:
+                evaluate();
+                break;
+            default:
+                std::cout << "请输入正确的数字!!!\n";
+                break;
+        }
+        goto label;
+    }
 }

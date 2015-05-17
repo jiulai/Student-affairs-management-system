@@ -9,19 +9,20 @@
 #ifndef __________Teachers__
 #define __________Teachers__
 
-#include <string>
 #include "common.h"
-#include <string.h>
+
 class TEACHERS : public BaseAction
 {
 public:
     TEACHERS();
-    TEACHERS(char *ID, const std::string &password) : BaseAction()
-        { strcat(_tecID, ID); _Password = password; }
-    bool check(char *account, char *password);
+    TEACHERS(const std::string &ID, const std::string &password) :
+                BaseAction(), _tecID(ID), _Password(password) { }
+    bool check();
+    void show();
 private:
-    char _tecID[19];
+    std::string _tecID;
     std::string _Password;
+    void update();
 };
 
 

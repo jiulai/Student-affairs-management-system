@@ -9,20 +9,21 @@
 #ifndef __C___test__Student__
 #define __C___test__Student__
 
-#include <string>
-#include <string.h>
 #include "common.h"
 
 class STUDENTS : public BaseAction
 {
 public:
     STUDENTS();
-    STUDENTS(char *ID, const std::string &password) : BaseAction(),
-        _stuID(ID) { strcpy(_Password, password.data()); }
-    bool check(char *account, char *password);
+    STUDENTS(const std::string &ID, const std::string &password) :
+                BaseAction(), _stuID(ID), _Password(password) { }
+    bool check();
+    void evaluate();
+    void show();
 private:
-    char *_stuID;
-    char _Password[255];
+    static int evaID;
+    std::string _stuID;
+    std::string _Password;
 };
 
 #endif /* defined(__C___test__Student__) */

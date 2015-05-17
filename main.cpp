@@ -1,8 +1,4 @@
 #include <iostream>
-#include <mysql.h>
-#include "Students.h"
-//#include "Managers.h"
-#include "common.h"
 #include "Login.h"
 
 int main()

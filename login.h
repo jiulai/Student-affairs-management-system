@@ -9,7 +9,6 @@
 #ifndef __________login__
 #define __________login__
 
-#include <mysql.h>
 #include "Managers.h"
 #include "Teachers.h"
 #include "Students.h"
@@ -22,6 +21,10 @@ private:
     void admin();
     void teach();
     void stu();
+    void signIn();
+    void signStu();
+    void signTec();
     bool quit();
+    bool addUser(const std::string&);
 };
 #endif /* defined(__________login__) */

@@ -8,7 +8,7 @@
 
 #ifndef __________common__
 #define __________common__
-//.查询课程具体信息 2.查询任课教师具体信息 3.查询课程历史纪录 如承担过该课的老师及用书
+
 #include <string>
 #include <mysql.h>
 
@@ -24,13 +24,14 @@ protected:
                          unsigned int port,
                          const char *unix_socket,
                          unsigned long flag);
+    virtual bool check(const std::string &temp);
+    virtual bool quit();
 private:
-       virtual void lookupHistory();
+    virtual void lookupHistory();
     virtual void lookupCourse();
     virtual void lookupTeacher();
     virtual void CourseBrief();
-    virtual bool quit();
-    virtual void output(const char*);
+    virtual void output(const std::string&);
 };
 
 #endif /* defined(__________common__) */

@@ -8,9 +8,6 @@
 
 #include "common.h"
 #include <iostream>
-#include <string.h>
-
-//.查询课程具体信息 2.查询任课教师具体信息 3.查询课程历史纪录 如承担过该课的老师及用书
 
 bool BaseAction::connect(const char *host, const char *user,
                          const char *password, const char *db,
@@ -25,12 +22,28 @@ bool BaseAction::connect(const char *host, const char *user,
     return false;
 }
 
-void BaseAction::output(const char *temp)
+bool BaseAction::check(const std::string &temp)
+{
+    connect("localhost", "root", "wjwjksning1995..",
+            "stuInfoManagement", 3306, nullptr, 0);
+    mysql_query(&mysql, "set names utf8");
+    mysql_query(&mysql, temp.data());
+    MYSQL_RES *result = mysql_store_result(&mysql);
+    
+    unsigned long row = mysql_num_rows(result);
+    mysql_close(&mysql);
+    mysql_free_result(result);
+    
+    if(row == 0)
+        return false;
+    return true;
+}
+
+void BaseAction::output(const std::string &temp)
 {
     mysql_query(&mysql, "set names utf8");
-    mysql_query(&mysql, temp);
+    mysql_query(&mysql, temp.data());
     MYSQL_RES *result = mysql_store_result(&mysql);
-    unsigned int num_fields = mysql_num_fields(result);
     unsigned long row = mysql_num_rows(result);
     
     if(row == 0)
@@ -40,10 +53,12 @@ void BaseAction::output(const char *temp)
     }
     
     MYSQL_ROW raw;
+    unsigned int num_fields = mysql_num_fields(result);
     while((raw = mysql_fetch_row(result)))
     {
         for(size_t i = 0; i < num_fields; ++i)
             std::cout << raw[i] << " ";
+        std::cout << "\n";
     }
     
     mysql_free_result(result);
@@ -52,8 +67,7 @@ void BaseAction::output(const char *temp)
 
 bool BaseAction::quit()
 {
-    std::cout << "返回上一层，请按'"
-              << "Y'\n";
+    std::cout << "返回上一层，请按Y\n";
     
     char q;
     std::cin >> q;
@@ -69,12 +83,11 @@ void BaseAction::show()
             "stuInfoManagement", 3306, nullptr, 0);
     int num = 0;
     bool q = true;
-fuck1:
+Label1:
     std::cout << "请输入所需查询信息编号:\n"   <<
-                 "1.查询课程具体信息\t\n"     <<
-                 "2.查询任课教师具体信息\t\n"  <<
-                 "3.查询课程历史纪录及详细信息\t\n" <<
-                 "4.";
+                 "1.查询课程具体信息\n"     <<
+                 "2.查询任课教师具体信息\n"  <<
+                 "3.";
     q = quit();
     
     if (q)
@@ -88,22 +101,18 @@ fuck1:
             case 2:
                 lookupTeacher();
                 break;
-            case 3:
-                lookupHistory();
-                break;
             default:
-                std::cout << "please input right" <<
-                             "fucking number.\n";
+                std::cout << "请输入正确的编号\n";
                 break;
         }
-        goto fuck1;
+        goto Label1;
     }
     mysql_close(&mysql);
 }
 
 void BaseAction::lookupCourse()
 {
-fuck2:
+Label2:
     std::cout << "请输入所需查询课程具体信息序号:\n" <<
                  "1.课程简介\n"                  <<
                  "2.课程历史纪录\n"               <<
@@ -124,73 +133,92 @@ fuck2:
                 lookupHistory();
                 break;
             default:
-                std::cout << "please input right " <<
-                             "fucking number.\n";
+                std::cout << "请输入正确的编号.\n";
                 break;
         }
-        goto fuck2;
+        goto Label2;
     }
 }
 
 void BaseAction::CourseBrief()
 {
-    char ID[255];
-    char temp[255];
-    
-    std::cout << "please input the subject ID :";
+    std::cout << "请输入课程编号 :";
+    std::string ID;
     std::cin >> ID;
     
-    strcat(temp, "select * from subjects where subID = ");
-    strcat(temp, ID);
+    std::string temp {"select subject, name, subjects.brief from subjects, tecSub, teachers where subjects.subID = tecSub.subID and tecSub.tecID = teachers.tecID and subjects.subID = "};
+    temp += ID;
     output(temp);
 }
 
 void BaseAction::lookupTeacher()
 {
-    char ID[255];
-    char temp[255];
-    std::cout << "please input the teachers ID :";
-    std::cin >> ID;
-    
-    strcat(temp, "select brief from teachers where tecID = ");
-    strcat(temp, ID);
-    output(temp);
+    bool q = true;
+    int num = 0;
+Label:
+    std::cout << "1.老师个人简介\n" <<
+                 "2.老师评价\n" <<
+                 "3.";
+    q = quit();
+
+    if (q)
+    {
+        std::string temp;
+        std::cin >> num;
+        
+        std::cout << "请输入老师编号: ";
+        std::string ID;
+        std::cin >> ID;
+        switch (num)
+        {
+            case 1:
+                temp={"select brief from teachers where tecID = "};
+                break;
+            case 2:
+                temp={"select comment from evaluation where tecID = "};
+                break;
+            default:
+                break;
+        }
+        temp += ID;
+        output(temp);
+        goto Label;
+    }
 }
 
 void BaseAction::lookupHistory()
 {
-fuck3:
+    bool q = true;
+    int num = 0;
+Label3:
     std::cout << "请输入所需查询课程具体信息序号:\n" <<
                  "1.某课程历史纪录\n"               <<
                  "2.某课老师历史纪录\n"
                  "3.";
-    bool q = quit();
-    int num = 0;
-    
-    while(q)
+    q = quit();
+    if (q)
     {
-        char ID[255];
-        char temp[255];
         std::cin >> num;
+        std::string ID;
+        std::string temp;
         switch (num)
         {
             case 1:
-                strcat(temp, "select subject, book, brief,firstTime     from history, subjects, tecSub where history.tecID = tecSub.tecID and history.subID =  ");
+                temp = "select subject, brief,firstTime     from history, subjects, tecSub where history.subID = subjects.subID and history.subID = ";
                 break;
             case 2:
-                strcat(temp, "select name from teachers, history where history.tecID = teachers.tecID and history.subID = ");
+                temp = "select name from teachers, history where history.tecID = teachers.tecID and history.subID = ";
                 break;
             default :
-                std::cout << "please input the fucking right number!!!";
-                continue;
+                std::cout << "请输入正确的编号!!!\n";
+                goto Label3;
+                break;
         }
-
-        std::cout << "please input the subject ID :";
+        std::cout << "请输入课程编号: ";
         std::cin >> ID;
-        strcat(temp, ID);
+        temp += ID;
     
         output(temp);
-        std::cout << std::endl;
-        goto fuck3;
+        goto Label3;
     }
 }

@@ -9,21 +9,21 @@
 #ifndef __C___test__Administrator__
 #define __C___test__Administrator__
 
-#include <string>
-#include <string.h>
 #include "common.h"
 
 class MANAGERS : public BaseAction
 {
 public:
     MANAGERS();
-    MANAGERS(char *manID, const std::string &password) :
-                            BaseAction(), _manID(manID)
-                            { strcpy(_Password, password.data()); }
-    bool check(char *account, char *password);
+    MANAGERS(const std::string &manID, const std::string &password)
+            : BaseAction(), _manID(manID), _Password(password) { }
+    bool check();
+    void show();
+    void update();
 private:
-    char *_manID;
-    char _Password[19];
+    std::string _manID;
+    std::string _Password;
+    unsigned long item(const std::string &temp);
 };
 
-#endif /* defined(__C___test__Administrator__) */
+#endif

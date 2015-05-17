@@ -7,27 +7,60 @@
 //
 
 #include "Teachers.h"
-#include <string.h>
+#include <iostream>
 
-bool TEACHERS::check(char *account, char *password)
+bool TEACHERS::check()
 {
-    char temp[255] = {"select* from teachers where tecID = "};
+    std::string temp {"select* from teachers where tecID = "};
+    temp += _tecID + " and password = '" + _Password + "'";
+    return BaseAction::check(temp);
+}
+
+void TEACHERS::show()
+{
+    bool q = true;
+    int num = 0;
+label:
+    std::cout << "1.查询\n" <<
+                 "2.更新\n" <<
+                 "3.";
+    q = quit();
+    if (q)
+    {
+        std::cin >> num;
+        switch (num)
+        {
+            case 1:
+                BaseAction::show();
+                break;
+            case 2:
+                update();
+                break;
+            default:
+                std::cout << "请输入正确的数字\n";
+                break;
+        }
+    }
+    goto label;
+}
+
+void TEACHERS::update()
+{
+    std::string subID;
+    std::cout << "请输入所需修改科目编号: ";
+    std::cin >> subID;
     
-    strcat(temp, account);
-    strcat(temp, " and password = '");
-    strcat(temp, password);
-    strcat(temp, "'");
+    std::cout << "请输入修改内容: ";
+    std::string contents;
+    getline(std::cin, contents);
     
+    mysql_init(&mysql);
     connect("localhost", "root", "wjwjksning1995..",
             "stuInfoManagement", 3306, nullptr, 0);
-    mysql_query(&mysql, "set names utf8");
-    mysql_query(&mysql, temp);
-    MYSQL_RES *result = mysql_store_result(&mysql);
     
-    unsigned long row = mysql_num_rows(result);
-    mysql_close(&mysql);
-    mysql_free_result(result);
-    if(row == 0)
-        return false;
-    return true;
+    std::string temp {"update tecSub set contents = "};
+    temp += contents + "where tecID = " + _tecID + " and subID = " + subID;
+    mysql_query(&mysql, "set names utf8");
+    mysql_query(&mysql, temp.data());
+    std::cout << "更新成功!!!\n";
 }
