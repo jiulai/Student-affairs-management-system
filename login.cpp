@@ -6,6 +6,7 @@
 //  Copyright (c) 2015年 王翛然. All rights reserved.
 //
 
+
 #include <iostream>
 #include "login.h"
 #include "Teachers.h"
@@ -14,7 +15,7 @@
 
 bool Login::quit()
 {
-    std::cout << "返回上一层,请按Y\n";
+    std::cout << "返回上一层\n";
     
     char q;
     std::cin >> q;
@@ -26,9 +27,10 @@ bool Login::quit()
 
 void Login::show()
 {
+    
     bool q;
     int num = 0;
-fuck:
+label:
     std::cout << "选择你的身份 \n"     <<
                  "1.管理员\n"         <<
                  "2.教师\n"           <<
@@ -36,7 +38,7 @@ fuck:
                  "4.注册\n"           <<
                  "5."                ;
     q = quit();
-    if(q)
+    if (q)
     {
         std::cin >> num;
         switch (num)
@@ -53,11 +55,13 @@ fuck:
             case 4:
                 signIn();
                 break;
+            case 5:
+                return;
             default:
                 std::cout << "请输入正确的数字\n";
                 break;
         }
-        goto fuck;
+        goto label;
     }
 }
 
@@ -72,7 +76,7 @@ void Login::admin()
     std::cin >> password;
     
     MANAGERS a(user, password);
-    if(!a.check())
+    if (!a.check())
     {
         std::cout << "账号或密码错误，请查认后输入！！！\n";
         return;
@@ -80,6 +84,7 @@ void Login::admin()
     else
     {
         a.show();
+        a.mysql_close();
     }
 }
 
@@ -102,6 +107,7 @@ void Login::teach()
     else
     {
         a.show();
+        a.mysql_close();
     }
 }
 
@@ -124,6 +130,7 @@ void Login::stu()
     else
     {
         a.show();
+        a.mysql_close();
     }
 }
 
@@ -136,7 +143,6 @@ label:
                  "2.注册学生账号请按2\n" <<
                  "3."   ;
     q = quit();
-    
     if (q)
     {
         std::cin >> num;
@@ -148,6 +154,8 @@ label:
             case 2:
                 signStu();
                 break;
+            case 3:
+                return;
             default:
                 std::cout << "请输入正确的数字!!!\n";
                 break;
@@ -186,10 +194,8 @@ void Login::signTec()
         std::string temp = {"insert into teachers value( "};
         temp += tecID + ", '" + password + "', " + s.data();
         
-        if (addUser(temp))
-            std::cout << "注册成功，请登陆.\n";
-        else
-            std::cout << "注册失败(未知原因)，请重新注册.\n";
+        addUser(temp);
+        std::cout << "注册成功，请登陆.\n";
     }
     else
     {
@@ -223,10 +229,8 @@ void Login::signStu()
         std::string temp {"insert into students value("};
         temp += stuID + ", '" + password + "', " + s.data();
         
-        if(addUser(temp))
-            std::cout << "注册成功，请登陆.\n";
-        else
-            std::cout << "注册失败(未知原因)，请重新注册.\n";
+        addUser(temp);
+        std::cout << "注册成功，请登陆.\n";
     }
     else
     {
@@ -234,16 +238,14 @@ void Login::signStu()
     }
 }
 
-bool Login::addUser(const std::string &temp)
+void Login::addUser(const std::string &temp)
 {
     MYSQL mysql;
     mysql_init(&mysql);
     mysql_real_connect(&mysql, "localhost", "root",
                        "wjwjksning1995..", "stuInfoManagement",
                        3306, nullptr, 0);
-    
     mysql_query(&mysql, "set names utf8");
     mysql_query(&mysql, temp.data());
     mysql_close(&mysql);
-    return true;
 }

@@ -21,7 +21,6 @@ public:
     void evaluate();
     void show();
 private:
-    static int evaID;
     std::string _stuID;
     std::string _Password;
 };

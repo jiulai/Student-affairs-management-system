@@ -25,6 +25,6 @@ private:
     void signStu();
     void signTec();
     bool quit();
-    bool addUser(const std::string&);
+    void addUser(const std::string&);
 };
 #endif /* defined(__________login__) */

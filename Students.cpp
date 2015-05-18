@@ -9,36 +9,11 @@
 #include "Students.h"
 #include <iostream>
 
-int STUDENTS::evaID = 1;
-
 bool STUDENTS::check()
 {
     std::string temp = {"select* from students where stuID = "};
     temp += _stuID + " and password = '" + _Password + "'";
     return BaseAction::check(temp);
-}
-
-void STUDENTS::evaluate()
-{
-    std::cout << "请输入想评价老师的ID:";
-    std::string tecID;
-    std::cin >> tecID;
-    
-    std::cout << "请输入评价内容:";
-    std::string comments;
-    getline(std::cin, comments);
-    
-    std::string temp {"insert into evaluation value("};
-    temp += std::to_string(evaID++) + ", '" + tecID + "', '" +
-                                                comments + "')";
-    
-    mysql_init(&mysql);
-    connect("localhost", "root", "wjwjksning1995..",
-            "stuInfoManagement", 3306, nullptr, 0);
-    mysql_query(&mysql, "set names utf8");
-    
-    mysql_query(&mysql, temp.data());
-    mysql_close(&mysql);
 }
 
 void STUDENTS::show()
@@ -68,3 +43,25 @@ label:
         goto label;
     }
 }
+
+void STUDENTS::evaluate()
+{
+    std::string temp = {"select evaluateID from evaluation"};
+    unsigned long evaID = 0;
+    evaID = item(temp) + 1;
+    
+    std::cout << "请输入想评价老师的ID:";
+    std::string tecID;
+    std::cin >> tecID;
+    
+    std::cout << "请输入评价内容:";
+    std::string comments;
+    std::cin >> comments;
+    
+    temp = {"insert into evaluation value("};
+    temp += std::to_string(evaID) + ", '" + tecID + "', '" +comments + "')";
+    add(temp);
+    
+    std::cout << "评价成功\n";
+}
+

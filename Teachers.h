@@ -10,6 +10,7 @@
 #define __________Teachers__
 
 #include "common.h"
+#include <utility>
 
 class TEACHERS : public BaseAction
 {
@@ -23,6 +24,10 @@ private:
     std::string _tecID;
     std::string _Password;
     void update();
+    void updateBook();
+    void updateContent();
+    bool checkSub(const std::string&);
+    std::pair<std::string, std::string> getInfo(int num);
 };
 
 

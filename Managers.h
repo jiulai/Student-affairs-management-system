@@ -23,7 +23,6 @@ public:
 private:
     std::string _manID;
     std::string _Password;
-    unsigned long item(const std::string &temp);
 };
 
 #endif

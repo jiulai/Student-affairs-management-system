@@ -40,27 +40,91 @@ label:
                 std::cout << "请输入正确的数字\n";
                 break;
         }
+        goto label;
     }
-    goto label;
 }
 
 void TEACHERS::update()
+{
+    bool q = true;
+    int num = 0;
+label:
+    std::cout << "1.更新用书\n"    <<
+                 "2.更新课程大纲\n" <<
+                 "3."             ;
+    q = quit();
+    if (q)
+    {
+        std::cin >> num;
+        switch (num)
+        {
+            case 1:
+                updateBook();
+                break;
+            case 2:
+                updateContent();
+                break;
+            default:
+                std::cout << "请输入正确的数字\n";
+                break;
+        }
+        goto label;
+    }
+}
+
+std::pair<std::string, std::string> TEACHERS::getInfo(int num)
 {
     std::string subID;
     std::cout << "请输入所需修改科目编号: ";
     std::cin >> subID;
     
-    std::cout << "请输入修改内容: ";
-    std::string contents;
-    getline(std::cin, contents);
+    std::string temp {"select * from tecSub where tecID = "};
+    temp += _tecID + " and subID = " + subID;
     
-    mysql_init(&mysql);
-    connect("localhost", "root", "wjwjksning1995..",
-            "stuInfoManagement", 3306, nullptr, 0);
+    if (!checkSub(temp))
+    {
+        std::cout << "您没有此课程，请查证后重试!!!\n";
+        return std::make_pair("", "");
+    }
+    if(num == 1)
+        std::cout << "请输入教材名称: ";
+    else
+        std::cout << "请输入课程大纲: ";
+    std::string info;
+    std::cin >> info;
     
-    std::string temp {"update tecSub set contents = "};
-    temp += contents + "where tecID = " + _tecID + " and subID = " + subID;
-    mysql_query(&mysql, "set names utf8");
-    mysql_query(&mysql, temp.data());
-    std::cout << "更新成功!!!\n";
+    return std::make_pair(subID, info);
+}
+
+bool TEACHERS::checkSub(const std::string& temp)
+{
+    if (item(temp) == 0)
+        return false;
+    return true;
+}
+
+void TEACHERS::updateBook()
+{
+    auto a = getInfo(1);
+    if(a.first != "" && a.second != "")
+    {
+        std::string temp {"update tecSub set Book = '"};
+        temp += a.second + "'where tecID = " + _tecID + " and subID = " + a.first;
+        add(temp);
+        std::cout << "更新成功!!!\n";
+    }
+}
+
+void TEACHERS::updateContent()
+{
+    auto a = getInfo(2);
+    
+    if(a.first != "" && a.second != "")
+    {
+        std::string temp {"update tecSub set contents = '"};
+        temp += a.second + "'where tecID = " + _tecID + " and subID = " + a.first;
+        
+        add(temp);
+        std::cout << "更新成功!!!\n";
+    }
 }

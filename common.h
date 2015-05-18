@@ -15,8 +15,10 @@
 class BaseAction
 {
 public:
-    BaseAction() { mysql_init(&mysql); }
+    BaseAction() { mysql_init(&mysql); connect("localhost", "root", "wjwjksning1995..","stuInfoManagement", 3306, nullptr, 0); }
     virtual void show();
+    virtual void mysql_close()
+        { ::mysql_close(&mysql); }
 protected:
     MYSQL mysql;
     virtual bool connect(const char *host, const char *user,
@@ -24,8 +26,10 @@ protected:
                          unsigned int port,
                          const char *unix_socket,
                          unsigned long flag);
-    virtual bool check(const std::string &temp);
     virtual bool quit();
+    virtual bool check(const std::string &temp);
+    virtual unsigned long item(const std::string &temp);
+    virtual void add(const std::string&);
 private:
     virtual void lookupHistory();
     virtual void lookupCourse();
